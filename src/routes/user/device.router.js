@@ -1,7 +1,9 @@
 import { Router } from 'express'
 import { asyncHandler } from '@/utils/helpers'
+import validate from '@/app/middleware/user/validate'
 import * as authMiddleware from '@/app/middleware/user/auth.middleware'
 import * as deviceController from '@/app/controllers/user/device.controller'
+import * as deviceRequest from '@/app/requests/user/device.request'
 
 const deviceRouter = Router()
 
@@ -29,6 +31,7 @@ deviceRouter.get(
 // Đăng ký mượn thiết bị
 deviceRouter.post(
     '/borrow',
+    asyncHandler(validate(deviceRequest.borrowDevice)),
     asyncHandler(deviceController.borrowDevice)
 )
 

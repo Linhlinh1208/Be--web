@@ -11,4 +11,5 @@ export {default as UserPermission} from './user-permission'
 export {default as Achievement} from './achievement'
 export {default as Event} from './event'
 export {default as EventParticipant} from './event-participant'
+export {default as Device} from './device'
 

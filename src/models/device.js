@@ -36,6 +36,16 @@ const Device = createModel(
             type: String,
             default: '',
             trim: true
+        },
+        category: {
+            type: String,
+            required: true,
+            trim: true
+        },
+        location: {
+            type: String,
+            required: true,
+            trim: true
         }
     },
     {

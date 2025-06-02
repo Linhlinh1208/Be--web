@@ -46,6 +46,11 @@ const Device = createModel(
             type: String,
             required: true,
             trim: true
+        },
+        serialNumber: {
+            type: String,
+            required: true,
+            unique: true
         }
     },
     {

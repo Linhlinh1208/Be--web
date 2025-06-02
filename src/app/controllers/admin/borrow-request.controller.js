@@ -1,5 +1,6 @@
-import * as borrowRequestService from '@/app/services/borrow-request.service'
-import { db } from '@/configs'
+import * as borrowRequestService from '../../services/borrow-request.service'
+import * as emailService from '../../services/email.service'
+import { db } from '../../../configs'
 
 // Lấy tất cả yêu cầu mượn
 export async function getAllBorrowRequests(req, res) {
@@ -28,15 +29,36 @@ export async function updateBorrowRequestStatus(req, res) {
 // Duyệt yêu cầu mượn
 export async function approveRequest(req, res) {
     await db.transaction(async (session) => {
-        await borrowRequestService.updateBorrowRequestStatus(session, req.params.id, 'APPROVED')
-        res.jsonify({ message: 'Đã duyệt yêu cầu mượn' })
+        const updatedRequest = await borrowRequestService.updateBorrowRequestStatus(
+            session,
+            req.params.id,
+            'APPROVED'
+        )
+
+        // Send email notification
+        await emailService.sendBorrowRequestApprovedEmail(
+            updatedRequest.user,
+            updatedRequest
+        )
+
+        res.jsonify({
+            message: 'Đã duyệt yêu cầu mượn',
+            request: updatedRequest
+        })
     })
 }
 
 // Từ chối yêu cầu mượn
 export async function rejectRequest(req, res) {
     await db.transaction(async (session) => {
-        await borrowRequestService.updateBorrowRequestStatus(session, req.params.id, 'REJECTED')
-        res.jsonify({ message: 'Đã từ chối yêu cầu mượn' })
+        const updatedRequest = await borrowRequestService.updateBorrowRequestStatus(
+            session,
+            req.params.id,
+            'REJECTED'
+        )
+        res.jsonify({
+            message: 'Đã từ chối yêu cầu mượn',
+            request: updatedRequest
+        })
     })
 }

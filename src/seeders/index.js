@@ -29,9 +29,7 @@ async function seed() {
         // Core data
         await deviceSeeder(session)
         await borrowRequestSeeder(session)
-
         await BorrowRecord(session)
-
         console.log(chalk.bold('Data has been initialized!'))
     })
 }

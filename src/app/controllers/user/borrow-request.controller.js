@@ -2,7 +2,12 @@ import * as borrowRequestService from '@/app/services/borrow-request.service'
 import { abort } from '@/utils/helpers'
 
 export async function getUserBorrowRequests(req, res) {
-    const borrowRequests = await borrowRequestService.getUserBorrowRequests(req.user.id)
+    const { page = 1, limit = 10, sort = { createdAt: -1 } } = req.query
+    const borrowRequests = await borrowRequestService.getUserBorrowRequests(req.user.id, {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        sort: typeof sort === 'string' ? JSON.parse(sort) : sort
+    })
     res.status(200).json(borrowRequests)
 }
 

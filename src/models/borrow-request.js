@@ -62,6 +62,14 @@ const BorrowRequest = createModel(
                     foreignField: '_id'
                 }
             }
+        },
+        methods: {
+            canBeApproved() {
+                return this.status === BORROW_REQUEST_STATUS.PENDING
+            },
+            canBeRejected() {
+                return this.status === BORROW_REQUEST_STATUS.PENDING
+            }
         }
     }
 )

@@ -29,11 +29,31 @@ export async function getBorrowRequestById(id) {
 }
 
 // Lấy danh sách yêu cầu của người dùng
-export async function getUserBorrowRequests(userId) {
+export async function getUserBorrowRequests(userId, { page = 1, limit = 10, sort = { createdAt: -1 } } = {}) {
     try {
-        const borrowRequests = await BorrowRequest.find({ userId }).populate('device')
-        return borrowRequests
+        const skip = (page - 1) * limit
+
+        const [borrowRequests, total] = await Promise.all([
+            BorrowRequest.find({ userId })
+                .populate('device')
+                .populate('user')
+                .sort(sort)
+                .skip(skip)
+                .limit(limit),
+            BorrowRequest.countDocuments({ userId })
+        ])
+
+        return {
+            data: borrowRequests,
+            pagination: {
+                page,
+                limit,
+                total,
+                totalPages: Math.ceil(total / limit)
+            }
+        }
     } catch (error) {
+        console.error('Error getting user borrow requests:', error)
         abort(500, 'Lỗi khi lấy yêu cầu mượn của người dùng.')
     }
 }
@@ -64,6 +84,7 @@ export async function createBorrowRequest(data) {
 
         return borrowRequest
     } catch (error) {
+        console.error('Error creating borrow request:', error)
         abort(500, 'Lỗi khi tạo yêu cầu mượn.')
     }
 }
@@ -71,8 +92,14 @@ export async function createBorrowRequest(data) {
 // Cập nhật trạng thái yêu cầu mượn
 export async function updateBorrowRequestStatus(session, id, status) {
     try {
-        const borrowRequest = await BorrowRequest.findById(id).session(session)
-        if (!borrowRequest) abort(404, 'Yêu cầu mượn không tồn tại.')
+        const borrowRequest = await BorrowRequest.findById(id)
+            .populate('user')
+            .populate('device')
+            .session(session)
+
+        if (!borrowRequest) {
+            abort(404, 'Yêu cầu mượn không tồn tại.')
+        }
 
         if (!borrowRequest.canBeApproved() && status === BORROW_REQUEST_STATUS.APPROVED) {
             abort(400, 'Yêu cầu không thể được duyệt.')
@@ -82,10 +109,26 @@ export async function updateBorrowRequestStatus(session, id, status) {
             abort(400, 'Yêu cầu không thể bị từ chối.')
         }
 
-        borrowRequest.status = status
-        await borrowRequest.save({ session })
-
+        // Kiểm tra thiết bị có sẵn sàng không khi duyệt yêu cầu
         if (status === BORROW_REQUEST_STATUS.APPROVED) {
+            const device = await Device.findById(borrowRequest.deviceId).session(session)
+            if (!device) {
+                abort(404, 'Thiết bị không tồn tại.')
+            }
+            if (device.status !== 'available') {
+                abort(400, 'Thiết bị hiện không sẵn sàng.')
+            }
+
+            const activeBorrows = await BorrowRecord.countDocuments({
+                deviceId: device._id,
+                status: BORROW_RECORD_STATUS.BORROWED,
+            }).session(session)
+
+            if (activeBorrows >= device.quantity) {
+                abort(400, 'Thiết bị đã được mượn hết.')
+            }
+
+            // Tạo bản ghi mượn mới
             await BorrowRecord.create([{
                 borrowRequestId: borrowRequest._id,
                 userId: borrowRequest.userId,
@@ -96,8 +139,15 @@ export async function updateBorrowRequestStatus(session, id, status) {
             }], { session })
         }
 
+        borrowRequest.status = status
+        await borrowRequest.save({ session })
+
         return borrowRequest
     } catch (error) {
+        console.error('Error updating borrow request status:', error)
+        if (error.status) {
+            throw error
+        }
         abort(500, 'Lỗi khi cập nhật trạng thái yêu cầu mượn.')
     }
 }
@@ -131,6 +181,7 @@ export async function returnDevice(id, userId) {
 
         return borrowRequest
     } catch (error) {
+        console.error('Error returning device:', error)
         abort(500, 'Lỗi khi trả thiết bị.')
     }
 }

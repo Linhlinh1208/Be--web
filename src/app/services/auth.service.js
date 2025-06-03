@@ -90,7 +90,7 @@ export async function blockToken(token) {
 export async function registerUser(userData) {
     // Xác định username là email hay phone
     const isEmail = VALIDATE_EMAIL_REGEX.test(userData.username)
-    
+
     // Kiểm tra email/phone đã tồn tại chưa
     if (isEmail) {
         const existingEmail = await User.findOne({ email: userData.username, deleted: false })
@@ -109,9 +109,9 @@ export async function registerUser(userData) {
         userData.phone = userData.username
         userData.email = ''
     }
-    
+
     // Tạo user mới
     const user = await User.create(userData)
-        
+
     return user
 }

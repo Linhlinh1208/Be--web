@@ -1,7 +1,7 @@
 import Joi from 'joi'
 import { AsyncValidate } from '@/utils/classes'
 import { Device } from '@/models'
-
+import { BORROW_REQUEST_STATUS } from '@/models/borrow-request'
 // Schema validation cho tạo thiết bị mới
 export const createDevice = Joi.object({
     name: Joi.string()
@@ -12,6 +12,16 @@ export const createDevice = Joi.object({
         .custom((value, helpers) =>
             new AsyncValidate(value, async function() {
                 const device = await Device.findOne({ name: value })
+                return !device ? value : helpers.error('any.exists')
+            })
+        ),
+    serialNumber: Joi.string()
+        .trim()
+        .required()
+        .label('Số serial')
+        .custom((value, helpers) =>
+            new AsyncValidate(value, async function() {
+                const device = await Device.findOne({ serialNumber: value })
                 return !device ? value : helpers.error('any.exists')
             })
         ),
@@ -118,4 +128,22 @@ export const borrowDevice = Joi.object({
         .allow('')
         .default('')
         .label('Ghi chú')
+})
+export const updateStatus = Joi.object({
+    status: Joi.string()
+        .valid(...Object.values(BORROW_REQUEST_STATUS))
+        .required()
+        .messages({
+            'string.base': 'Trạng thái không hợp lệ',
+            'any.required': 'Trạng thái là bắt buộc',
+            'any.only': 'Trạng thái không hợp lệ'
+        }),
+    reason: Joi.when('status', {
+        is: BORROW_REQUEST_STATUS.REJECTED,
+        then: Joi.string().required().messages({
+            'string.empty': 'Lý do từ chối là bắt buộc',
+            'any.required': 'Lý do từ chối là bắt buộc'
+        }),
+        otherwise: Joi.string().allow('').optional()
+    })
 })

@@ -42,25 +42,6 @@ export default async function seed(session) {
                 status: BORROW_RECORD_STATUS.BORROWED,
                 note: 'Đang sử dụng',
             },
-            {
-                borrowRequestId: requests[2]._id,
-                userId: users[2]._id,
-                deviceId: devices[2]._id,
-                borrowDate: addDays(now, -5),
-                returnDate: addDays(now, -2),
-                actualReturnDate: null,
-                status: BORROW_RECORD_STATUS.OVERDUE,
-                note: 'Chưa trả thiết bị',
-            },
-            {
-                borrowRequestId: requests[3]._id,
-                userId: users[0]._id,
-                deviceId: devices[3]._id,
-                borrowDate: addDays(now, -2),
-                returnDate: addDays(now, 2),
-                status: BORROW_RECORD_STATUS.BORROWED,
-                note: 'Sử dụng cho sự kiện khoa',
-            },
         ]
 
         await BorrowRecord.insertMany(borrowRecords, { session })

@@ -13,7 +13,7 @@ export async function readDeviceById(req, res) {
     res.jsonify(device)
 }
 
-// Tạo thiết bị mới
+// Tạo thiết bị mớis
 export async function createDevice(req, res) {
     await db.transaction(async (session) => {
         const newDevice = await deviceService.createDevice(session, req.body)

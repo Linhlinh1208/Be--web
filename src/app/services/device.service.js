@@ -4,13 +4,19 @@ import { abort } from '@/utils/helpers'
 // Lấy tất cả thiết bị theo query
 export async function getAllDevices(query = {}) {
     try {
+        console.log('Fetching devices with query:', query)
         const devices = await Device.find(query)
             .populate('borrowRequests')
             .populate('borrowRecords')
             .lean()
+            .exec()
+        if (!devices) {
+            return []
+        }
 
         return devices
     } catch (error) {
+        console.error('Error in getAllDevices:', error)
         abort(500, 'Lỗi khi lấy danh sách thiết bị.')
     }
 }

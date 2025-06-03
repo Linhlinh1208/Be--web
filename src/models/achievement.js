@@ -33,4 +33,4 @@ const achievementSchema = {
     },
 }
 
-export default createModel('Achievement', 'achievements', achievementSchema) 
+export default createModel('Achievement', 'achievements', achievementSchema)

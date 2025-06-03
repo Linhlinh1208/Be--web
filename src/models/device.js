@@ -65,6 +65,20 @@ const Device = createModel(
                 get() {
                     return this.quantity
                 }
+            },
+            borrowRequests: {
+                options: {
+                    ref: 'BorrowRequest',
+                    localField: '_id',
+                    foreignField: 'deviceId'
+                }
+            },
+            borrowRecords: {
+                options: {
+                    ref: 'BorrowRecord',
+                    localField: '_id',
+                    foreignField: 'deviceId'
+                }
             }
         }
     }

@@ -5,7 +5,8 @@ import path from 'path'
 const EMAIL_TEMPLATES = {
     BORROW_REQUEST_APPROVED: 'borrow-request-approved',
     BORROW_DUE_REMINDER: 'borrow-due-reminder',
-    BORROW_OVERDUE_ALERT: 'borrow-overdue-alert'
+    BORROW_OVERDUE_ALERT: 'borrow-overdue-alert',
+    DEVICE_RETURNED: 'device-returned'
 }
 
 export async function sendBorrowRequestApprovedEmail(user, borrowRequest) {
@@ -44,6 +45,19 @@ export async function sendBorrowOverdueAlert(user, borrowRequest) {
         )
     } catch (error) {
         logger.error('Error sending borrow overdue alert email', error)
+    }
+}
+
+export async function sendDeviceReturnedEmail(user, borrowRequest, { actualReturnDate }) {
+    try {
+        await sendEmail(
+            user.email,
+            'Thiết bị đã được trả thành công',
+            EMAIL_TEMPLATES.DEVICE_RETURNED,
+            { user, borrowRequest, actualReturnDate }
+        )
+    } catch (error) {
+        logger.error('Error sending device returned email', error)
     }
 }
 

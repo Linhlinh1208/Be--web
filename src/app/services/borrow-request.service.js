@@ -2,6 +2,7 @@ import BorrowRequest, { BORROW_REQUEST_STATUS } from '@/models/borrow-request'
 import BorrowRecord, { BORROW_RECORD_STATUS } from '@/models/borrow-record'
 import Device from '@/models/device'
 import { abort } from '@/utils/helpers'
+import * as emailService from '@/app/services/email.service'
 
 // Lấy tất cả yêu cầu mượn
 export async function getAllBorrowRequests(query = {}) {
@@ -152,18 +153,16 @@ export async function updateBorrowRequestStatus(session, id, status) {
     }
 }
 
-// Trả thiết bị
-export async function returnDevice(id, userId) {
+// Trả thiết bị (Admin only)
+export async function returnDevice(id) {
     try {
         const borrowRequest = await BorrowRequest.findById(id)
+            .populate('user')
+            .populate('device')
         if (!borrowRequest) abort(404, 'Yêu cầu mượn không tồn tại.')
 
-        if (borrowRequest.userId.toString() !== userId) {
-            abort(403, 'Bạn không có quyền trả thiết bị này.')
-        }
-
         if (borrowRequest.status !== BORROW_REQUEST_STATUS.APPROVED) {
-            abort(400, 'Yêu cầu mượn chưa được duyệt.')
+            abort(400, 'Chỉ có thể trả thiết bị đã được duyệt.')
         }
 
         const borrowRecord = await BorrowRecord.findOne({
@@ -178,6 +177,15 @@ export async function returnDevice(id, userId) {
         borrowRecord.status = BORROW_RECORD_STATUS.RETURNED
         borrowRecord.actualReturnDate = new Date()
         await borrowRecord.save()
+
+        // Send email notification to user
+        await emailService.sendDeviceReturnedEmail(
+            borrowRequest.user,
+            borrowRequest,
+            {
+                actualReturnDate: borrowRecord.actualReturnDate
+            }
+        )
 
         return borrowRequest
     } catch (error) {

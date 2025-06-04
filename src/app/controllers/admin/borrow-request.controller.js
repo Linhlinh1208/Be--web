@@ -3,6 +3,7 @@ import * as emailService from '../../services/email.service'
 import { db } from '../../../configs'
 import { BORROW_REQUEST_STATUS } from '../../../models/borrow-request'
 
+
 // Lấy tất cả yêu cầu mượn
 export async function getAllBorrowRequests(req, res) {
     const borrowRequests = await borrowRequestService.getAllBorrowRequests(req.query)
@@ -61,5 +62,13 @@ export async function rejectRequest(req, res) {
             message: 'Đã từ chối yêu cầu mượn',
             request: updatedRequest
         })
+    })
+}
+
+export async function returnDevice(req, res) {
+    const borrowRequest = await borrowRequestService.returnDevice(req.params.id)
+    res.status(200).json({
+        message: 'Đã xác nhận trả thiết bị thành công',
+        request: borrowRequest
     })
 }

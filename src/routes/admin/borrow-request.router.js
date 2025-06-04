@@ -20,4 +20,7 @@ router.patch('/:id/approve', asyncHandler(borrowRequestController.approveRequest
 // Reject borrow request
 router.patch('/:id/reject', asyncHandler(borrowRequestController.rejectRequest))
 
+// Return device (Admin only)
+router.patch('/:id/return', asyncHandler(borrowRequestController.returnDevice))
+
 export default router

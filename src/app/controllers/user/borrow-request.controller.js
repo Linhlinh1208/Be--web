@@ -26,8 +26,3 @@ export async function createBorrowRequest(req, res) {
     })
     res.status(201).json(borrowRequest)
 }
-
-export async function returnDevice(req, res) {
-    const borrowRequest = await borrowRequestService.returnDevice(req.params.id, req.user.id)
-    res.status(200).json(borrowRequest)
-}

@@ -17,7 +17,4 @@ router.get('/:id', asyncHandler(borrowRequestController.getBorrowRequestById))
 // Create new borrow request
 router.post('/', asyncHandler(borrowRequestController.createBorrowRequest))
 
-// Return device
-router.patch('/:id/return', asyncHandler(borrowRequestController.returnDevice))
-
 export default router

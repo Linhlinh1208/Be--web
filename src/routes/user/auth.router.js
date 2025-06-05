@@ -25,4 +25,12 @@ authRouter.post(
     asyncHandler(authController.logout)
 )
 
-export default authRouter 
+// Add a simple ping endpoint for diagnostics
+authRouter.get(
+    '/ping',
+    (req, res) => {
+        res.json({ status: 'ok', timestamp: new Date().toISOString() })
+    }
+)
+
+export default authRouter

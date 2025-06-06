@@ -34,11 +34,17 @@ const BorrowRequest = createModel(
             enum: Object.values(BORROW_REQUEST_STATUS),
             default: BORROW_REQUEST_STATUS.PENDING
         },
+        purpose: {
+            type: String,
+            required: true,
+            trim: true,
+            maxlength: 500
+        },
         note: {
             type: String,
             default: '',
             trim: true
-        }
+        },
     },
     {
         toJSON: {

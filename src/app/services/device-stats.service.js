@@ -1,4 +1,4 @@
-import BorrowRecord from '@/models/borrow-record'
+import BorrowRecord, { BORROW_RECORD_STATUS } from '@/models/borrow-record'
 import { startOfMonth, endOfMonth } from 'date-fns'
 
 export async function getTopBorrowedDevices(limit = 10) {
@@ -47,27 +47,42 @@ export async function getTopBorrowedDevices(limit = 10) {
     return topDevices
 }
 
+// Lấy danh sách thiết bị quá hạn
 export async function getOverdueBorrows() {
-    const now = new Date()
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
 
     return await BorrowRecord.find({
-        returnDate: { $lt: now },
-        actualReturnDate: null,
-        status: 'borrowed'
+        status: BORROW_RECORD_STATUS.BORROWED,
+        returnDate: { $lt: today }
     })
-        .populate('device')
-        .populate('user')
+        .populate({
+            path: 'borrowRequestId',
+            populate: [
+                { path: 'user', select: 'name email phone' },
+                { path: 'device', select: 'name code' }
+            ]
+        })
 }
 
+// Lấy danh sách thiết bị sắp đến hạn (mặc định 3 ngày)
 export async function getDueSoonBorrows(daysThreshold = 3) {
-    const now = new Date()
-    const threshold = new Date(now.setDate(now.getDate() + daysThreshold))
-
+    const today = new Date()
+    const dueDate = new Date()
+    dueDate.setDate(today.getDate() + daysThreshold)
+    
     return await BorrowRecord.find({
-        returnDate: { $lte: threshold, $gt: now },
-        actualReturnDate: null,
-        status: 'borrowed'
+        status: BORROW_RECORD_STATUS.BORROWED,
+        returnDate: { 
+            $gte: today,
+            $lte: dueDate 
+        }
     })
-        .populate('device')
-        .populate('user')
+        .populate({
+            path: 'borrowRequestId',
+            populate: [
+                { path: 'user', select: 'name email phone' },
+                { path: 'device', select: 'name code' }
+            ]
+        })
 }

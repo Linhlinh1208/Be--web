@@ -7,13 +7,19 @@ import { BORROW_REQUEST_STATUS } from '../../../models/borrow-request'
 // Lấy tất cả yêu cầu mượn
 export async function getAllBorrowRequests(req, res) {
     const borrowRequests = await borrowRequestService.getAllBorrowRequests(req.query)
-    res.json(borrowRequests)
+    res.json({
+        message: 'Lấy danh sách yêu cầu mượn thành công',
+        data: borrowRequests
+    })
 }
 
 // Lấy chi tiết yêu cầu mượn
 export async function getBorrowRequestById(req, res) {
     const borrowRequest = await borrowRequestService.getBorrowRequestById(req.params.id)
-    res.json(borrowRequest)
+    res.json({
+        message: 'Lấy thông tin yêu cầu mượn thành công',
+        data: borrowRequest
+    })
 }
 
 // Cập nhật trạng thái yêu cầu mượn (APPROVED, REJECTED,...)
@@ -24,7 +30,10 @@ export async function updateBorrowRequestStatus(req, res) {
             req.params.id,
             req.body.status
         )
-        res.status(200).json(updatedRequest)
+        res.status(200).json({
+            message: 'Cập nhật trạng thái yêu cầu mượn thành công',
+            data: updatedRequest
+        })
     })
 }
 
@@ -37,15 +46,9 @@ export async function approveRequest(req, res) {
             BORROW_REQUEST_STATUS.APPROVED
         )
 
-        // Send email notification
-        await emailService.sendBorrowRequestApprovedEmail(
-            updatedRequest.user,
-            updatedRequest
-        )
-
         res.json({
-            message: 'Đã duyệt yêu cầu mượn',
-            request: updatedRequest
+            message: 'Đã duyệt yêu cầu mượn thành công',
+            data: updatedRequest
         })
     })
 }
@@ -59,8 +62,8 @@ export async function rejectRequest(req, res) {
             BORROW_REQUEST_STATUS.REJECTED
         )
         res.json({
-            message: 'Đã từ chối yêu cầu mượn',
-            request: updatedRequest
+            message: 'Đã từ chối yêu cầu mượn thành công',
+            data: updatedRequest
         })
     })
 }
@@ -69,6 +72,6 @@ export async function returnDevice(req, res) {
     const borrowRequest = await borrowRequestService.returnDevice(req.params.id)
     res.status(200).json({
         message: 'Đã xác nhận trả thiết bị thành công',
-        request: borrowRequest
+        data: borrowRequest
     })
 }

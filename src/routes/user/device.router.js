@@ -28,13 +28,6 @@ deviceRouter.get(
     asyncHandler(deviceController.getDeviceById)
 )
 
-// Đăng ký mượn thiết bị
-deviceRouter.post(
-    '/borrow',
-    asyncHandler(validate(deviceRequest.borrowDevice)),
-    asyncHandler(deviceController.borrowDevice)
-)
-
 // Lấy danh sách yêu cầu mượn của user
 deviceRouter.get(
     '/my-requests',

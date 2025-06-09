@@ -138,6 +138,12 @@ export async function updateBorrowRequestStatus(session, id, status) {
                 returnDate: borrowRequest.returnDate,
                 status: BORROW_RECORD_STATUS.BORROWED,
             }], { session })
+
+            // Gửi email thông báo khi duyệt yêu cầu
+            await emailService.sendBorrowRequestApprovedEmail(
+                borrowRequest.user,
+                borrowRequest
+            )
         }
 
         borrowRequest.status = status

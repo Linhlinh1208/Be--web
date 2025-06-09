@@ -58,13 +58,13 @@ deviceRouter.get(
 )
 
 // Duyệt yêu cầu mượn thiết bị
-deviceRouter.put(
+deviceRouter.patch(
     '/borrow-requests/:id/approve',
     asyncHandler(borrowRequestController.approveRequest)
 )
 
 // Từ chối yêu cầu mượn thiết bị
-deviceRouter.put(
+deviceRouter.patch(
     '/borrow-requests/:id/reject',
     asyncHandler(borrowRequestController.rejectRequest)
 )

@@ -17,4 +17,7 @@ router.get('/:id', asyncHandler(borrowRequestController.getBorrowRequestById))
 // Create new borrow request
 router.post('/', asyncHandler(borrowRequestController.createBorrowRequest))
 
+// // Cancel borrow request
+// router.delete('/:id', asyncHandler(borrowRequestController.cancelBorrowRequest))
+
 export default router

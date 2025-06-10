@@ -4,7 +4,8 @@ const BORROW_REQUEST_STATUS = {
     PENDING: 'pending',
     APPROVED: 'approved',
     REJECTED: 'rejected',
-    CANCELLED: 'cancelled'
+    CANCELLED: 'cancelled',
+    RETURNED: 'returned'
 }
 
 const BorrowRequest = createModel(
@@ -28,6 +29,12 @@ const BorrowRequest = createModel(
         returnDate: {
             type: Date,
             required: true
+        },
+        quantity: {
+            type: Number,
+            required: true,
+            min: 1,
+            default: 1
         },
         status: {
             type: String,

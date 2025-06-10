@@ -9,6 +9,13 @@ const User = createModel(
             type: String,
             required: true,
         },
+        username: {
+            type: String,
+            required: true,
+            unique: true,
+            trim: true,
+            lowercase: true
+        },
         email: {
             type: String,
             lowercase: true,
@@ -31,7 +38,7 @@ const User = createModel(
             default: ''
         },
         address: {
-            type: Date,
+            type: String,
             default: ''
         },
         avatar: {
@@ -45,6 +52,11 @@ const User = createModel(
                 const salt = bcrypt.genSaltSync(10)
                 return bcrypt.hashSync(value, salt)
             },
+        },
+        role: {
+            type: String,
+            enum: ['user', 'admin'],
+            default: 'user'
         },
         status: {
             type: String,
